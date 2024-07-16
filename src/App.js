@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   const [counter, setCounter] = useState(0);
@@ -6,6 +6,11 @@ function App() {
   const onClick = () => {
     setCounter((prev) => prev + 1);
   };
+
+  const iRunOnlyOnce = () => {
+    console.log("I run only once.");
+  };
+  useEffect(iRunOnlyOnce, []);
   return (
     <div>
       <h1>{counter}</h1>
