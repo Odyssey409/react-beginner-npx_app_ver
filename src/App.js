@@ -2,49 +2,40 @@ import { useEffect, useState } from "react";
 
 function App() {
   const [loading, setLoading] = useState(true);
-  const [money, setMoney] = useState(0);
-  const [coinValue, setCoinValue] = useState("");
-  const [affordableCoinCnt, setAffordableCoinCnt] = useState(0);
+  const [movies, setMovies] = useState([]);
 
-  const [coins, setCoins] = useState([]);
-  useEffect(() => {
-    fetch("https://api.coinpaprika.com/v1/tickers").then((response) =>
-      response.json().then((json) => {
-        setCoins(json);
-        setLoading(false);
-      })
+  const getMovies = async () => {
+    const response = await fetch(
+      `https://yts.mx/api/v2/list_movies.json?minimum_rating=9.0&sort_by=year`
     );
+    const json = await response.json();
+    setMovies(json.data.movies);
+    setLoading(false);
+  };
+  useEffect(() => {
+    getMovies();
   }, []);
-
-  const onChange = (event) => {
-    setMoney(event.target.value);
-  };
-
-  const onChangeSelect = (event) => {
-    setCoinValue(event.target.value);
-    console.log(coinValue);
-    setAffordableCoinCnt(money / parseFloat(coinValue));
-  };
 
   return (
     <div>
-      <h1>The Coins ({coins.length})</h1>
-      <span>I have</span>
-      <input onChange={onChange}></input> <span>USD Dollars</span>
-      <br></br>
       {loading ? (
-        <strong>Loading...</strong>
+        <h1>Loading...</h1>
       ) : (
-        <select onChange={onChangeSelect} value={coinValue}>
-          {coins.map((coin) => (
-            <option key={coin.id} value={coin.quotes.USD.price}>
-              {coin.name} ({coin.symbol}) : {coin.quotes.USD.price} USD
-            </option>
+        <div>
+          {movies.map((movie) => (
+            <div key={movie.id}>
+              <img src={movie.medium_cover_image} />
+              <h2>{movie.title}</h2>
+              <p>{movie.summary}</p>
+              <ul>
+                {movie.genres?.map((g) => (
+                  <li key={g}>{g}</li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </select>
+        </div>
       )}
-      <br></br>
-      <h1>You can buy {affordableCoinCnt} coins</h1>
     </div>
   );
 }
